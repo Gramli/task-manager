@@ -34,7 +34,7 @@ jobs:
 
       # Build Angular app
       - name: Build Angular app
-        run: ng build --configuration production --output-path browser
+        run: ng build --configuration production
         working-directory: ./
 
       - name: List files after build
