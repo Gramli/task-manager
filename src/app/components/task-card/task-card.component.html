@@ -1,0 +1,26 @@
+<div class="task-card" [attr.status]="task.status">
+  <div class="task-top" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <h4 class="task-title">{{ task.title }}</h4>
+    <span class="status-chip small">{{ task.status | titlecase }}</span>
+  </div>
+
+  <p class="task-desc" *ngIf="task.description">{{ task.description }}</p>
+
+  <div class="task-footer" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <div class="task-timer small">
+      <span class="time-counter">{{ formatTime(displayTime) }}</span>
+      <span *ngIf="task.isTimerActive" style="margin-left:8px;color:var(--accent)">●</span>
+    </div>
+
+    <div class="task-actions">
+      <button
+        (click)="toggleTimer()"
+        type="button"
+        aria-label="Toggle timer"
+        [disabled]="task.status === 'done'"
+      >
+        {{ task.isTimerActive ? 'Stop' : 'Start' }}
+      </button>
+    </div>
+  </div>
+</div>

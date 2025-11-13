@@ -1,0 +1,116 @@
+.task-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 500px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.task-column h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.task-column h3::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* Task list container */
+.task-list {
+  min-height: 400px;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px dashed var(--border);
+  transition: all 0.2s ease;
+}
+
+/* Highlight when dragging over */
+.task-list.cdk-drop-list-dragging {
+  border-color: var(--accent);
+  background: rgba(0, 122, 204, 0.05);
+  box-shadow: inset 0 0 12px rgba(0, 122, 204, 0.1);
+}
+
+/* Empty placeholder */
+.task-list.cdk-drop-list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-list .empty {
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 24px 16px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+/* Task count badge */
+.task-column .task-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* Status-specific styling */
+.task-column[status="draft"] h3::before {
+  background: var(--text-secondary);
+}
+
+.task-column[status="inProgress"] h3::before {
+  background: var(--accent);
+}
+
+.task-column[status="done"] h3::before {
+  background: var(--success);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .task-column {
+    min-height: 300px;
+    gap: 10px;
+  }
+
+  .task-list {
+    min-height: 250px;
+  }
+
+  .task-column h3 {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+}

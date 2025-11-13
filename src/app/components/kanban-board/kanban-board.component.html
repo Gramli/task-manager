@@ -1,0 +1,50 @@
+<div class="kanban-board">
+  <h2>Gramli Task Manager</h2>
+
+  <form class="task-form" (ngSubmit)="createTask()">
+    <input 
+      [(ngModel)]="newTaskTitle" 
+      name="title"
+      placeholder="Enter task title..." 
+      required
+      class="task-input"
+    >
+    <textarea 
+      [(ngModel)]="newTaskDescription" 
+      name="description"
+      placeholder="Enter task description..." 
+      required
+      class="task-input"
+    ></textarea>
+    <button type="submit" [disabled]="!newTaskTitle || !newTaskDescription">
+      Create Task
+    </button>
+  </form>
+
+  <div class="task-columns">
+    <app-task-column 
+      [title]="'Draft'" 
+      [tasks]="draftTasks"
+      [status]="'draft'"
+      cdkDropListGroup
+      [cdkDropListConnectedTo]="['inProgress', 'done']"
+      (taskDropped)="onTaskDrop($event, 'draft')"
+    ></app-task-column>
+    <app-task-column 
+      [title]="'In Progress'" 
+      [tasks]="inProgressTasks"
+      [status]="'inProgress'"
+      cdkDropListGroup
+      [cdkDropListConnectedTo]="['draft', 'done']"
+      (taskDropped)="onTaskDrop($event, 'inProgress')"
+    ></app-task-column>
+    <app-task-column 
+      [title]="'Done'" 
+      [tasks]="doneTasks"
+      [status]="'done'"
+      cdkDropListGroup
+      [cdkDropListConnectedTo]="['draft', 'inProgress']"
+      (taskDropped)="onTaskDrop($event, 'done')"
+    ></app-task-column>
+  </div>
+</div>
