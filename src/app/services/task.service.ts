@@ -7,7 +7,7 @@ const STORE_NAME = 'tasks';
 const DB_VERSION = 1;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskService {
   private tasks = new BehaviorSubject<Task[]>([]);
@@ -84,15 +84,18 @@ export class TaskService {
       status: 'draft',
       timeSpent: 0,
       isTimerActive: false,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
     const updated = [...this.tasks.value, newTask];
     this.tasks.next(updated);
     return this.putTaskToDB(newTask);
   }
 
-  async updateTaskStatus(taskId: string, newStatus: 'draft' | 'inProgress' | 'done'): Promise<void> {
-    const updated = this.tasks.value.map(t =>
+  async updateTaskStatus(
+    taskId: string,
+    newStatus: 'draft' | 'inProgress' | 'done'
+  ): Promise<void> {
+    const updated = this.tasks.value.map((t) =>
       t.id === taskId ? { ...t, status: newStatus } : t
     );
     this.tasks.next(updated);
@@ -100,7 +103,7 @@ export class TaskService {
   }
 
   async startTimer(taskId: string): Promise<void> {
-    const updated = this.tasks.value.map(t => {
+    const updated = this.tasks.value.map((t) => {
       if (t.id === taskId && !t.isTimerActive) {
         return { ...t, isTimerActive: true, startedAt: Date.now() };
       }
@@ -112,19 +115,54 @@ export class TaskService {
 
   async stopTimer(taskId: string): Promise<void> {
     const now = Date.now();
-    const updated = this.tasks.value.map(t => {
+    const updated = this.tasks.value.map((t) => {
       if (t.id === taskId && t.isTimerActive) {
-        const elapsed = t.startedAt ? Math.floor((now - t.startedAt) / 1000) : 0;
+        const elapsed = t.startedAt
+          ? Math.floor((now - t.startedAt) / 1000)
+          : 0;
         return {
           ...t,
           isTimerActive: false,
           startedAt: undefined,
-          timeSpent: (t.timeSpent || 0) + elapsed
+          timeSpent: (t.timeSpent || 0) + elapsed,
         };
       }
       return t;
     });
     this.tasks.next(updated);
     await this.putAllToDB(updated);
+  }
+
+  async clearTimer(taskId: string): Promise<void> {
+    const updated = this.tasks.value.map((t) => {
+      if (t.id === taskId) {
+        return {
+          ...t,
+          isTimerActive: false,
+          startedAt: undefined,
+          timeSpent: 0,
+        };
+      }
+      return t;
+    });
+    this.tasks.next(updated);
+    await this.putAllToDB(updated);
+  }
+
+  private async deleteTaskFromDB(taskId: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.delete(taskId);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async deleteTask(taskId: string): Promise<void> {
+    const updated = this.tasks.value.filter((t) => t.id !== taskId);
+    this.tasks.next(updated);
+    await this.deleteTaskFromDB(taskId);
   }
 }

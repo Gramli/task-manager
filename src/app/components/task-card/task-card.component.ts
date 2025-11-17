@@ -1,4 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
@@ -9,7 +17,7 @@ import { TaskService } from '../../services/task.service';
   imports: [CommonModule],
   templateUrl: './task-card.component.html',
   styleUrls: ['./task-card.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskCardComponent implements OnChanges, OnDestroy {
   @Input() task!: Task;
@@ -17,10 +25,15 @@ export class TaskCardComponent implements OnChanges, OnDestroy {
   displayTime = 0;
   private tickHandle: any = null;
 
-  constructor(private taskService: TaskService, private cd: ChangeDetectorRef) {}
+  constructor(
+    private taskService: TaskService,
+    private cd: ChangeDetectorRef
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this.task) { return; }
+    if (!this.task) {
+      return;
+    }
     this.updateDisplayTime();
 
     if (this.task.isTimerActive) {
@@ -30,14 +43,24 @@ export class TaskCardComponent implements OnChanges, OnDestroy {
     }
   }
 
+  get showClearTimer(): boolean {
+    if (!this.task) {
+      return false;
+    }
+    return this.task.status === 'draft' && this.task.timeSpent > 0;
+  }
+
   ngOnDestroy(): void {
     this.stopLocalTicker();
   }
 
   toggleTimer(): void {
-    if (!this.task) { return; }
-    // guard: do not allow toggling timer for tasks in done state
-    if (this.task.status === 'done') { return; }
+    if (!this.task) {
+      return;
+    }
+    if (this.task.status === 'done' || this.task.status === 'draft') {
+      return;
+    }
 
     if (this.task.isTimerActive) {
       this.taskService.stopTimer(this.task.id);
@@ -58,7 +81,9 @@ export class TaskCardComponent implements OnChanges, OnDestroy {
   }
 
   private startLocalTicker(): void {
-    if (this.tickHandle) { return; }
+    if (this.tickHandle) {
+      return;
+    }
     this.tickHandle = setInterval(() => {
       this.updateDisplayTime();
       this.cd.markForCheck();
@@ -81,9 +106,30 @@ export class TaskCardComponent implements OnChanges, OnDestroy {
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     const parts: string[] = [];
-    if (hrs) { parts.push(`${hrs}h`); }
-    if (mins || hrs) { parts.push(`${mins}m`); }
+    if (hrs) {
+      parts.push(`${hrs}h`);
+    }
+    if (mins || hrs) {
+      parts.push(`${mins}m`);
+    }
     parts.push(`${secs}s`);
     return parts.join(' ');
+  }
+
+  async deleteTask(): Promise<void> {
+    if (!this.task) {
+      return;
+    }
+    if (this.task.isTimerActive) {
+      await this.taskService.stopTimer(this.task.id);
+    }
+    await this.taskService.deleteTask(this.task.id);
+  }
+
+  async clearTimer(): Promise<void> {
+    if (!this.task) {
+      return;
+    }
+    await this.taskService.clearTimer(this.task.id);
   }
 }
