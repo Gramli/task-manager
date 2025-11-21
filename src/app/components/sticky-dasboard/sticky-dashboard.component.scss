@@ -1,0 +1,10 @@
+.sticky-root { position:relative; height:100%; display:flex; }
+.panel-toggle { position:fixed; left:8px; top:8px; z-index:50; }
+.side-panel {
+  width:240px; padding:12px; background:var(--panel-bg); box-shadow:2px 2px 6px rgba(0,0,0,0.08);
+}
+.canvas { flex:1; position:relative; overflow:auto; background:var(--canvas-bg,#fff); min-height:850px; }
+.note-list { margin-top:10px; }
+.note-row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+.note-row .del { color:#c0392b; border:none; background:transparent; cursor:pointer; }
+.color-palette button { width:92px; height:32px; border-radius:4px; margin:6px; border:none; cursor:pointer; }

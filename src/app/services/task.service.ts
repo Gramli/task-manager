@@ -4,7 +4,7 @@ import { Task } from '../models/task.model';
 
 const DB_NAME = 'task-manager-db';
 const STORE_NAME = 'tasks';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 @Injectable({
   providedIn: 'root',

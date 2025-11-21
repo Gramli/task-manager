@@ -1,0 +1,29 @@
+<div class="sticky-root">
+  <aside class="side-panel">
+    <h2>Sticky Notes</h2>
+    <div class="color-palette">
+      <button *ngFor="let c of colors" (click)="createNote(c)" [style.background]="c">+ New</button>
+    </div>
+
+    <div class="note-list">
+      <ng-container *ngIf="(notes$ | async) as notes">
+        <div *ngFor="let n of notes" class="note-row">
+          <button (click)="onDelete(n.id)" class="del">🗑</button>
+          <button (click)="onUpdate(n.id, { x: 60, y: 60 })" [style.background]="n.color">Center</button>
+          <span class="title">{{ n.title || 'Untitled' }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </aside>
+
+  <main class="canvas">
+    <ng-container *ngIf="(notes$ | async) as notes">
+      <app-sticky-note
+        *ngFor="let n of notes"
+        [note]="n"
+        (update)="onUpdate(n.id, $event)"
+        (delete)="onDelete($event)"
+      ></app-sticky-note>
+    </ng-container>
+  </main>
+</div>

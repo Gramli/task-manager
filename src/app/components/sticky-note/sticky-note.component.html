@@ -1,0 +1,47 @@
+<div
+  class="sticky-note"
+  cdkDrag
+  (cdkDragEnded)="onDragEnded($event)"
+  (dblclick)="editing = true"
+  [ngStyle]="{
+    left: note.x + 'px',
+    top: note.y + 'px',
+    width: (note.width || 220) + 'px',
+    height: (note.height || 200) + 'px',
+    'background-color': note.color
+  }"
+>
+  <div class="sticky-header">
+    <input
+      [(ngModel)]="note.title"
+      (blur)="emitUpdate({ title: note.title })"
+      placeholder="Title"
+      
+    />
+    <div class="actions">
+      <button *ngIf="!editing" (click)="editing = true" type="button">✎</button>
+      <button *ngIf="editing" (click)="editing = false" type="button">✔</button>
+      <button (click)="onDelete()" type="button" class="delete">🗑</button>
+    </div>
+  </div>
+
+  <textarea
+    *ngIf="editing"
+    class="sticky-textarea"
+    [(ngModel)]="note.content"
+    placeholder="Add content..."
+    (blur)="onTextAreaBlur({ content: note.content })"
+  ></textarea>
+
+  <div class="sticky-content" *ngIf="!editing">
+    <p class="content-text">{{ note.content }}</p>
+  </div>
+
+  <div class="sticky-footer" *ngIf="!editing">
+    <small>{{
+      note.updatedAt
+        ? (note.updatedAt | date : "short")
+        : (note.createdAt | date : "short")
+    }}</small>
+  </div>
+</div>
