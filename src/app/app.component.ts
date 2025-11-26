@@ -1,18 +1,26 @@
 import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
+import { DBService } from './services/db.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   currentTheme: 'dark' | 'light' = 'dark';
 
+  constructor(private dbService: DBService) {}
+
   ngOnInit(): void {
-    const saved = (localStorage.getItem('theme') as 'dark' | 'light' | null) ?? 'dark';
+    this.dbService.init().catch((err) => {
+      console.error('Failed to initialize database', err);
+    });
+
+    const saved =
+      (localStorage.getItem('theme') as 'dark' | 'light' | null) ?? 'dark';
     this.setTheme(saved);
   }
 
@@ -25,7 +33,6 @@ export class AppComponent {
     try {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
-    } catch {
-    }
+    } catch {}
   }
 }

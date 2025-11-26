@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from '../models/task.model';
+import { DBService } from './db.service';
 
-const DB_NAME = 'task-manager-db';
-const STORE_NAME = 'tasks';
-const DB_VERSION = 2;
+export const TASK_STORE_NAME = 'tasks';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +11,7 @@ const DB_VERSION = 2;
 export class TaskService {
   private tasks = new BehaviorSubject<Task[]>([]);
 
-  constructor() {
+  constructor(private dbService: DBService) {
     this.loadFromIndexedDB();
   }
 
@@ -20,25 +19,11 @@ export class TaskService {
     return this.tasks.asObservable();
   }
 
-  private openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        }
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-
   private async loadFromIndexedDB(): Promise<void> {
     try {
-      const db = await this.openDB();
-      const tx = db.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
+      const db = await this.dbService.openDB();
+      const tx = db.transaction(TASK_STORE_NAME, 'readonly');
+      const store = tx.objectStore(TASK_STORE_NAME);
       const req = store.getAll();
       req.onsuccess = () => {
         const items = (req.result || []) as Task[];
@@ -53,10 +38,10 @@ export class TaskService {
   }
 
   private async putTaskToDB(task: Task): Promise<void> {
-    const db = await this.openDB();
+    const db = await this.dbService.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
+      const tx = db.transaction(TASK_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(TASK_STORE_NAME);
       const req = store.put(task);
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
@@ -64,10 +49,10 @@ export class TaskService {
   }
 
   private async putAllToDB(tasks: Task[]): Promise<void> {
-    const db = await this.openDB();
+    const db = await this.dbService.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
+      const tx = db.transaction(TASK_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(TASK_STORE_NAME);
       for (const t of tasks) {
         store.put(t);
       }
@@ -150,10 +135,10 @@ export class TaskService {
   }
 
   private async deleteTaskFromDB(taskId: string): Promise<void> {
-    const db = await this.openDB();
+    const db = await this.dbService.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
+      const tx = db.transaction(TASK_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(TASK_STORE_NAME);
       const req = store.delete(taskId);
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);

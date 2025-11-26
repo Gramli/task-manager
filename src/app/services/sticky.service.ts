@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StickyNote } from '../models/sticky.model';
+import { DBService } from './db.service';
 
-const DB_NAME = 'task-manager-db';
-const STORE_NAME = 'stickies';
-const DB_VERSION = 2;
+export const STICKY_STORE_NAME = 'stickies';
 
 @Injectable({ providedIn: 'root' })
 export class StickyService {
   private notes$ = new BehaviorSubject<StickyNote[]>([]);
 
-  constructor() {
+  constructor(private dbService: DBService) {
     this.loadFromIndexedDB();
   }
 
@@ -18,25 +17,11 @@ export class StickyService {
     return this.notes$.asObservable();
   }
 
-  private openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = () => {
-        const db = req.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        }
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-
   private async loadFromIndexedDB(): Promise<void> {
     try {
-      const db = await this.openDB();
-      const tx = db.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
+      const db = await this.dbService.openDB();
+      const tx = db.transaction(STICKY_STORE_NAME, 'readonly');
+      const store = tx.objectStore(STICKY_STORE_NAME);
       const req = store.getAll();
       req.onsuccess = () => this.notes$.next(req.result || []);
       req.onerror = () => console.error('Failed to load stickies', req.error);
@@ -46,10 +31,10 @@ export class StickyService {
   }
 
   private async putNoteToDB(note: StickyNote): Promise<void> {
-    const db = await this.openDB();
+    const db = await this.dbService.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
+      const tx = db.transaction(STICKY_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STICKY_STORE_NAME);
       const req = store.put(note);
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
@@ -57,10 +42,10 @@ export class StickyService {
   }
 
   private async deleteNoteFromDB(id: string): Promise<void> {
-    const db = await this.openDB();
+    const db = await this.dbService.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
+      const tx = db.transaction(STICKY_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STICKY_STORE_NAME);
       const req = store.delete(id);
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
