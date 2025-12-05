@@ -16,9 +16,10 @@
       [(ngModel)]="note.title"
       (blur)="emitUpdate({ title: note.title })"
       placeholder="Title"
-      
     />
     <div class="actions">
+      <button (click)="decrease()" type="button">-</button>
+      <button (click)="increase()" type="button">+</button>
       <button *ngIf="!editing" (click)="editing = true" type="button">✎</button>
       <button *ngIf="editing" (click)="editing = false" type="button">✔</button>
       <button (click)="onDelete()" type="button" class="delete">🗑</button>

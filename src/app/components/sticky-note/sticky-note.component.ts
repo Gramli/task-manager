@@ -38,4 +38,12 @@ export class StickyNoteComponent {
   onDelete() {
     this.delete.emit(this.note.id);
   }
+
+  increase(){
+    this.emitUpdate({ width: (this.note.width ?? 220) + 20, height: (this.note.height ?? 200) + 20 });
+  }
+
+  decrease(){
+    this.emitUpdate({ width: Math.max((this.note.width ?? 220) - 20, 200), height: Math.max((this.note.height ?? 200) - 20, 200) });
+  }
 }
