@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { STICKY_STORE_NAME } from './sticky.service';
 import { TASK_STORE_NAME } from './task.service';
+import { TODO_STORE_NAME } from './todo.service';
 
 @Injectable({ providedIn: 'root' })
 export class DBService {
   private readonly DB_NAME = 'task-manager-db';
-  private readonly DB_VERSION = 3;
+  private readonly DB_VERSION = 4;
   private initPromise?: Promise<void>;
   private cachedDb?: IDBDatabase;
-  private requiredStores: string[] = [TASK_STORE_NAME, STICKY_STORE_NAME];
+  private requiredStores: string[] = [TASK_STORE_NAME, STICKY_STORE_NAME, TODO_STORE_NAME];
 
   init(): Promise<void> {
     if (this.initPromise) return this.initPromise;

@@ -1,0 +1,170 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.todos-container {
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1rem;
+  overflow-x: clip;
+}
+
+h2 {
+  text-align: center;
+  margin: 0 0 1rem;
+  color: var(--text);
+}
+
+.add-todo-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.todo-input {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+.todos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.625rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.todo-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  background: var(--panel);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  min-width: 0;
+  width: 100%;
+}
+
+.todo-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.todo-item.completed {
+  background: color-mix(in srgb, var(--success) 16%, var(--panel));
+}
+
+.todo-checkbox {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.125rem;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.todo-content {
+  min-width: 0;
+  width: 100%;
+}
+
+.todo-text {
+  display: block;
+  width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.5;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.todo-text.completed-text {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.todo-date {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.todo-edit-input {
+  width: 100%;
+  min-height: 2.375rem;
+}
+
+.delete-btn {
+  align-self: center;
+  margin: 0;
+  white-space: nowrap;
+  min-height: 2.25rem;
+  background-color: var(--error);
+  color: #fff;
+}
+
+.delete-btn:hover,
+.delete-btn:focus-visible,
+.delete-btn:active {
+  background-color: color-mix(in srgb, var(--error) 80%, #000 20%);
+  color: #fff;
+}
+
+.no-todos {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0.75rem 0 0;
+}
+
+@media (max-width: 48rem) {
+  .todos-container {
+    padding: 0.75rem;
+  }
+
+  .add-todo-form {
+    grid-template-columns: 1fr;
+  }
+
+  .add-todo-form button {
+    width: 100%;
+  }
+
+  .todo-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .delete-btn {
+    grid-column: 2;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 30rem) {
+  .todo-item {
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  .todo-checkbox {
+    margin-top: 0;
+  }
+
+  .delete-btn {
+    grid-column: auto;
+    width: 100%;
+    justify-self: stretch;
+  }
+}

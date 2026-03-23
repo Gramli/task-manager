@@ -7,4 +7,5 @@ export interface Task {
   isTimerActive: boolean;
   startedAt?: number; // timestamp ms when timer was started
   createdAt: Date;
+  order: number;
 }

@@ -1,34 +1,41 @@
 <div class="app-container">
   <nav class="app-topbar">
     <div class="app-topbar-inner">
-      <img src="assets/avatars.ico" alt="Gramli" class="app-logo" />
+      <div class="logo-section">
+        <img src="assets/avatars.ico" alt="Task Manager Logo" class="app-logo" />
+        <span class="app-title">TaskFlow</span>
+      </div>
+      
       <div class="nav-links" aria-label="main navigation">
-        <a
-          routerLink="/tasks"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <button type="button" class="nav-btn">Tasks Manager</button>
+        <a routerLink="/tasks" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+          <span class="nav-label">Tasks</span>
         </a>
-        <a routerLink="/stickies" routerLinkActive="active">
-          <button type="button" class="nav-btn">Sticky Notes</button>
+        <a routerLink="/stickies" routerLinkActive="active-link" class="nav-item">
+          <span class="nav-label">Stickies</span>
+        </a>
+        <a routerLink="/todos" routerLinkActive="active-link" class="nav-item">
+          <span class="nav-label">TODOs</span>
         </a>
       </div>
+
       <div class="topbar-controls">
-        <span class="version">v0.2</span>
+        <span class="version-badge">v0.2</span>
         <button
           class="theme-toggle"
           (click)="toggleTheme()"
-          aria-label="Toggle theme"
-          title="Toggle theme"
+          [attr.aria-label]="currentTheme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+          [title]="currentTheme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
           type="button"
         >
-          ☀️
+          <span class="icon">{{ currentTheme === 'light' ? '🌙' : '☀️' }}</span>
         </button>
       </div>
     </div>
   </nav>
+
   <main class="app-shell">
-    <router-outlet></router-outlet>
+    <div class="app-shell-inner">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

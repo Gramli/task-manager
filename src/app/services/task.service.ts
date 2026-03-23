@@ -27,6 +27,18 @@ export class TaskService {
       const req = store.getAll();
       req.onsuccess = () => {
         const items = (req.result || []) as Task[];
+        // Assign orders if missing
+        const grouped = items.reduce((acc, task) => {
+          if (!acc[task.status]) acc[task.status] = [];
+          acc[task.status].push(task);
+          return acc;
+        }, {} as Record<string, Task[]>);
+        Object.values(grouped).forEach(group => {
+          group.sort((a, b) => (a.order || 0) - (b.order || 0));
+          group.forEach((task, index) => {
+            if (task.order === undefined) task.order = index;
+          });
+        });
         this.tasks.next(items);
       };
       req.onerror = () => {
@@ -62,6 +74,9 @@ export class TaskService {
   }
 
   addTask(title: string, description: string): Promise<void> {
+    const currentTasks = this.tasks.value;
+    const draftTasks = currentTasks.filter(t => t.status === 'draft');
+    const maxOrder = draftTasks.length > 0 ? Math.max(...draftTasks.map(t => t.order || 0)) : 0;
     const newTask: Task = {
       id: Date.now().toString(),
       title,
@@ -70,21 +85,16 @@ export class TaskService {
       timeSpent: 0,
       isTimerActive: false,
       createdAt: new Date(),
+      order: maxOrder + 1,
     };
-    const updated = [...this.tasks.value, newTask];
+    const updated = [...currentTasks, newTask];
     this.tasks.next(updated);
     return this.putTaskToDB(newTask);
   }
 
-  async updateTaskStatus(
-    taskId: string,
-    newStatus: 'draft' | 'inProgress' | 'done'
-  ): Promise<void> {
-    const updated = this.tasks.value.map((t) =>
-      t.id === taskId ? { ...t, status: newStatus } : t
-    );
-    this.tasks.next(updated);
-    await this.putAllToDB(updated);
+  async updateTasks(tasks: Task[]): Promise<void> {
+    this.tasks.next(tasks);
+    await this.putAllToDB(tasks);
   }
 
   async startTimer(taskId: string): Promise<void> {

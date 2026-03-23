@@ -27,15 +27,15 @@ export class KanbanBoardComponent implements OnInit {
   }
 
   get draftTasks(): Task[] {
-    return this.tasks.filter(task => task.status === 'draft');
+    return this.tasks.filter(task => task.status === 'draft').sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   get inProgressTasks(): Task[] {
-    return this.tasks.filter(task => task.status === 'inProgress');
+    return this.tasks.filter(task => task.status === 'inProgress').sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   get doneTasks(): Task[] {
-    return this.tasks.filter(task => task.status === 'done');
+    return this.tasks.filter(task => task.status === 'done').sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   createTask(): void {
@@ -48,8 +48,14 @@ export class KanbanBoardComponent implements OnInit {
 
   onTaskDrop(event: CdkDragDrop<Task[]>, newStatus: 'draft' | 'inProgress' | 'done'): void {
     if (event.previousContainer === event.container) {
+      // Reordering within the same column
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      // Update orders
+      event.container.data.forEach((task, index) => {
+        task.order = index;
+      });
     } else {
+      // Moving to different column
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -57,7 +63,15 @@ export class KanbanBoardComponent implements OnInit {
         event.currentIndex
       );
       const task = event.container.data[event.currentIndex];
-      this.taskService.updateTaskStatus(task.id, newStatus);
+      task.status = newStatus;
+      // Update orders for both containers
+      event.previousContainer.data.forEach((t, index) => {
+        t.order = index;
+      });
+      event.container.data.forEach((t, index) => {
+        t.order = index;
+      });
     }
+    this.taskService.updateTasks(this.tasks);
   }
 }

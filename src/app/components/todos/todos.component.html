@@ -1,0 +1,61 @@
+<div class="todos-container">
+  <h2>My TODOs</h2>
+
+  <form class="add-todo-form" (ngSubmit)="addTodo()">
+    <input
+      type="text"
+      [(ngModel)]="newTodoText"
+      name="newTodo"
+      placeholder="Add a new TODO item..."
+      required
+      class="todo-input"
+    >
+    <button type="submit" [disabled]="!newTodoText.trim()">Add</button>
+  </form>
+
+  <ul class="todos-list" cdkDropList [cdkDropListData]="todos" (cdkDropListDropped)="onDrop($event)">
+    <li
+      *ngFor="let todo of todos"
+      class="todo-item"
+      [class.completed]="todo.completed"
+      cdkDrag
+      (click)="onTodoItemClick(todo, $event)"
+    >
+      <input
+        type="checkbox"
+        [checked]="todo.completed"
+        (change)="toggleTodo(todo.id)"
+        (click)="$event.stopPropagation()"
+        class="todo-checkbox"
+      >
+      <div class="todo-content">
+        <span
+          *ngIf="!todo.editing"
+          class="todo-text"
+          [class.completed-text]="todo.completed"
+          (dblclick)="todo.editing = true"
+        >
+          {{ todo.text }}
+        </span>
+        <small *ngIf="!todo.editing" class="todo-date">
+          Created: {{ todo.createdAt | date:'medium' }}
+        </small>
+      <input
+        *ngIf="todo.editing"
+        type="text"
+        [value]="todo.text"
+        (blur)="finishEditing(todo, $event)"
+        (keyup.enter)="finishEditing(todo, $event)"
+        (keyup.escape)="todo.editing = false"
+        (click)="$event.stopPropagation()"
+        class="todo-edit-input"
+        #editInput
+        (focus)="editInput.select()"
+      >
+      </div>
+      <button (click)="deleteTodo(todo.id); $event.stopPropagation()" class="delete-btn">Delete</button>
+    </li>
+  </ul>
+
+  <p *ngIf="todos.length === 0" class="no-todos">No TODO items yet. Add one above!</p>
+</div>
